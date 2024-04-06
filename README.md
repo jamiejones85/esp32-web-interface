@@ -63,7 +63,18 @@ Tompile it follow the [instructions below](#development).
 
 # Flashing / Upgrading
 ## Wirelessly
-TBA
+Create a file platformio-local-override.ini and put in it
+```
+[env]
+upload_protocol = espota
+upload_port = 192.168.4.1
+upload_flags = 
+```
+Install platformio on your system and flash with commands
+```
+pio run --target upload
+pio run --target uploadfs
+```
 
 ## Wired
 If your board is new and unprogrammed, or if you want to fully re-program it, you'll need to have a wired connection between your computer and the board.
