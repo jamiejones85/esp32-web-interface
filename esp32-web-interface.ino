@@ -492,17 +492,8 @@ static void handleCommand() {
   if (!fastUart && fastUartAvailable)
   {
     sendCommand("fastuart");
-    if (uart_readStartsWith("OK"))
-    {
-      //Inverter.begin(921600, SERIAL_8N1, INVERTER_RX, INVERTER_TX);
-      //Inverter.updateBaudRate(921600);
-      uart_set_baudrate(INVERTER_PORT, 921600);
-      fastUart = true;
-    }
-    else
-    {
-      fastUartAvailable = false;
-    }
+    uart_set_baudrate(INVERTER_PORT, 921600);
+    fastUart = true;
   }
 
   sendCommand(cmd);

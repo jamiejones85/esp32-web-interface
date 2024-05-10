@@ -326,7 +326,7 @@ var ui = {
 		versionDiv.innerHTML = "";
 		var firmwareVersion = String(paramsCache.get('version'));
 		versionDiv.innerHTML += "firmware : " + firmwareVersion + "<br>";
-		versionDiv.innerHTML += "web : v2.2"
+		versionDiv.innerHTML += "web : v2.3"
 	},
 
 	/** @brief If beta features are visible, hide them. If hidden, show them. */
@@ -538,6 +538,9 @@ var ui = {
 			{
 				uploadFirmwareBar.innerHTML = "<p>Update Done!</p>";
 				setTimeout(function() { modal.hideModal('small'); ui.refresh(); }, 3000);
+				var xhr=new XMLHttpRequest();
+				xhr.open("DELETE", "/edit?f="+file);
+				xhr.send();
 			}
 		}
 		runUpdateRequest.open("GET", "/fwupdate?step=" + step + "&file=" + file);
