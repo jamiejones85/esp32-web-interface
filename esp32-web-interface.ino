@@ -568,12 +568,18 @@ static void handleUpdate()
 
 static void handleNodeId()
 {
-  if(server.hasArg("id")) {
+  if(server.hasArg("id") && server.hasArg("canspeed")) {
     int id = server.arg("id").toInt();
-    OICan::Init(id);
+    int speed = server.arg("canspeed").toInt();
+    OICan::BaudRate baud = speed == 0 ? OICan::Baud125k : (speed == 1 ? OICan::Baud250k : OICan::Baud500k);
+    OICan::Init(id, baud);
+  }
+  else if(server.hasArg("id")) {
+    int id = server.arg("id").toInt();
+    OICan::Init(id, OICan::Baud500k);
   }
 
-  server.send(200, "text/plain", String(OICan::GetNodeId()));
+  server.send(200, "text/plain", String(OICan::GetNodeId()) + "," + String(OICan::GetBaudRate()));
 }
 
 static void handleWifi()
@@ -686,7 +692,7 @@ void setup(void){
 
   MDNS.begin(host);
 
-  OICan::Init(1);
+  OICan::Init(1, OICan::Baud500k);
 
   updater.setup(&server);
 

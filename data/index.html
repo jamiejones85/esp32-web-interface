@@ -158,7 +158,13 @@
 
       <div id="nodeid-div" class="control small-screen-hide">
         <label for="nodeid">Node ID:</label>
-        <input id="nodeid" type="number" id="nodeid" step="1" min="1" max="63" value="1" onchange="ui.setNodeId(this.value)"/>
+        <input id="nodeid" type="number" id="nodeid" step="1" min="1" max="63" value="1" onchange="ui.setNodeIdAndSpeed()"/>
+        <label for="canspeed">Speed:</label>
+        <select name="canspeed" id="canspeed" onchange="ui.setNodeIdAndSpeed()">
+          <option value="0">125k</option>
+          <option value="1">250k</option>
+          <option value="2">500k</option>
+        </select>
       </div>
 			<!-- auto reload toggle -->
 			<div id="auto-reload-toggle-div" class="control small-screen-hide">

@@ -62,6 +62,7 @@ enum state { IDLE, ERROR, OBTAINSERIAL, OBTAIN_JSON };
 enum updstate { UPD_IDLE, SEND_MAGIC, SEND_SIZE, SEND_PAGE, CHECK_CRC, REQUEST_JSON };
 
 static uint8_t _nodeId;
+static BaudRate baudRate;
 static state state;
 static updstate updstate;
 static uint32_t serial[4]; //contains id sum as well
@@ -328,7 +329,7 @@ int GetCurrentUpdatePage() {
 bool SendJson(WiFiClient client) {
   if (state != IDLE) return false;
 
-  DynamicJsonDocument doc(30000);
+  DynamicJsonDocument doc(50000);
   twai_message_t rxframe;
 
   File file = SPIFFS.open(jsonFileName, "r");
@@ -631,7 +632,11 @@ int GetNodeId() {
   return _nodeId;
 }
 
-void Init(uint8_t nodeId) {
+BaudRate GetBaudRate() {
+  return baudRate;
+}
+
+void Init(uint8_t nodeId, BaudRate baud) {
   twai_general_config_t g_config = {
         .mode = TWAI_MODE_NORMAL,
         .tx_io = GPIO_NUM_25,
@@ -649,7 +654,22 @@ void Init(uint8_t nodeId) {
   twai_stop();
   twai_driver_uninstall();
 
-  twai_timing_config_t t_config = TWAI_TIMING_CONFIG_500KBITS();
+  twai_timing_config_t t_config;
+  baudRate = baud;
+
+  switch (baud)
+  {
+  case Baud125k:
+    t_config = TWAI_TIMING_CONFIG_125KBITS();
+    break;
+  case Baud250k:
+    t_config = TWAI_TIMING_CONFIG_250KBITS();
+    break;
+  case Baud500k:
+    t_config = TWAI_TIMING_CONFIG_500KBITS();
+    break;
+  }
+
   twai_filter_config_t f_config = {.acceptance_code = (uint32_t)(id << 5) | (uint32_t)(0x7de << 21),
                                    .acceptance_mask = 0x001F001F,
                                    .single_filter = false};

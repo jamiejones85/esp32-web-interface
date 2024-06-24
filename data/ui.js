@@ -157,22 +157,24 @@ var ui = {
 
     xmlhttp.onload = function()
     {
-        document.getElementById("nodeid").value = this.responseText;
+        document.getElementById("nodeid").value = this.responseText.split(',')[0];
+        document.getElementById("canspeed").value = this.responseText.split(',')[1];
     }
 
     xmlhttp.open("GET", "/nodeid", true);
     xmlhttp.send();
   },
 
-  setNodeId: function(id) {
+  setNodeIdAndSpeed: function() {
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onload = function()
     {
-        document.getElementById("nodeid").value = this.responseText;
+        document.getElementById("nodeid").value = this.responseText.split(',')[0];
+        document.getElementById("canspeed").value = this.responseText.split(',')[1];
     }
 
-    xmlhttp.open("GET", "/nodeid?id=" + id, true);
+    xmlhttp.open("GET", "/nodeid?id=" + document.getElementById("nodeid").value + "&canspeed=" + document.getElementById("canspeed").value, true);
     xmlhttp.send();
   },
 
