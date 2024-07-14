@@ -64,7 +64,9 @@
 #define INVERTER_TX 17
 #define UART_TIMEOUT (100 / portTICK_PERIOD_MS)
 #define UART_MESSBUF_SIZE 100
+#ifndef LED_BUILTIN
 #define LED_BUILTIN  5
+#endif
 
 #define RESERVED_SD_SPACE 2000000000
 #define SDIO_BUFFER_SIZE 16384
@@ -101,6 +103,8 @@ uint16_t blockCountSD = 0;
 File dataFile;
 int startLogAttempt = 0;
 
+uint32_t deleteOldest(uint64_t spaceRequired);
+
 bool createNextSDFile()
 {
   char filename[50];
@@ -113,9 +117,9 @@ bool createNextSDFile()
   do
   {
     if(haveRTC)
-      snprintf(filename, 50, "/%d-%02d-%02d-%02d-%02d-%02d_%d.bin", int_rtc.getYear(), int_rtc.getMonth(), int_rtc.getDay(), int_rtc.getHour(), int_rtc.getMinute(), int_rtc.getSecond(), nextFileIndex++);
+      snprintf(filename, 50, "/%d-%02d-%02d-%02d-%02d-%02d_%" PRIu32 ".bin", int_rtc.getYear(), int_rtc.getMonth(), int_rtc.getDay(), int_rtc.getHour(), int_rtc.getMinute(), int_rtc.getSecond(), nextFileIndex++);
     else
-      snprintf(filename, 50, "/%010d.bin", nextFileIndex++);
+      snprintf(filename, 50, "/%010" PRIu32 ".bin", nextFileIndex++);
   }
   while(SD_MMC.exists(filename));
 
@@ -132,7 +136,6 @@ bool createNextSDFile()
 
 uint32_t deleteOldest(uint64_t spaceRequired)
 {
-  time_t oldestTime = 0;
   File root, file;
   String oldestFileName;
   uint64_t spaceRem;
@@ -149,7 +152,7 @@ uint32_t deleteOldest(uint64_t spaceRequired)
   {
     root = SD_MMC.open("/");
 
-    oldestTime = 0;
+    time_t oldestTime = 0;
     fileCount = 0;
     while(file = root.openNextFile())
     {
@@ -242,7 +245,7 @@ bool handleFileRead(String path){
       path += ".gz";
     File file = SPIFFS.open(path, "r");
     server.sendHeader("Cache-Control", "max-age=86400");
-    size_t sent = server.streamFile(file, contentType);
+    server.streamFile(file, contentType);
     file.close();
     return true;
   }
@@ -255,7 +258,7 @@ bool handleFileRead(String path){
 
     if (SD_MMC.exists(path)) {
       File file = SD_MMC.open(path, "r");
-      size_t sent = server.streamFile(file, contentType);
+      server.streamFile(file, contentType);
       file.close();
     return true;
     }
@@ -343,16 +346,13 @@ void handleRTCSet() {
 void handleSdCardDeleteAll() {
     if (haveSDCard) {
       File root, file;
-      if (haveSDCard) {
-        root = SD_MMC.open("/");
-        while(file = root.openNextFile())
-        {
-          String filename = file.name();
-          if(SD_MMC.remove("/" + filename))
-            DBG_OUTPUT_PORT.println("Deleted file: " + filename);
-          else
-            DBG_OUTPUT_PORT.println("Couldn't delete: " + filename);
-          }
+      root = SD_MMC.open("/");
+      while(file = root.openNextFile()) {
+        String filename = file.name();
+        if(SD_MMC.remove("/" + filename))
+          DBG_OUTPUT_PORT.println("Deleted file: " + filename);
+        else
+          DBG_OUTPUT_PORT.println("Couldn't delete: " + filename);
       }
     }
 
@@ -394,7 +394,7 @@ void handleSdCardList() {
 void handleFileList() {
   String path = "/";
   if(server.hasArg("dir"))
-    String path = server.arg("dir");
+    path = server.arg("dir");
   //DBG_OUTPUT_PORT.println("handleFileList: " + path);
   File root = SPIFFS.open(path);
   String output = "[";
@@ -407,7 +407,6 @@ void handleFileList() {
   File file = root.openNextFile();
   while(file){
     if (output != "[") output += ',';
-    bool isDir = false;
     output += "{\"type\":\"";
     output += file.isDirectory()?"dir":"file";
     output += "\",\"name\":\"";
@@ -464,7 +463,6 @@ static void sendCommand(String cmd)
 }
 
 static void handleCommand() {
-  const int cmdBufSize = 128;
   if(!server.hasArg("cmd")) {server.send(500, "text/plain", "BAD ARGS"); return;}
 
   String cmd = server.arg("cmd");
@@ -609,7 +607,7 @@ static void handleWifi()
   if (updated)
   {
     File file = SPIFFS.open("/wifi-updated.html", "r");
-    size_t sent = server.streamFile(file, getContentType("wifi-updated.html"));
+    server.streamFile(file, getContentType("wifi-updated.html"));
     file.close();
   }
 }
@@ -640,7 +638,9 @@ void setup(void){
         .data_bits = UART_DATA_8_BITS,
         .parity    = UART_PARITY_DISABLE,
         .stop_bits = UART_STOP_BITS_1,
-        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE};
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE,
+        .rx_flow_ctrl_thresh = UART_HW_FLOWCTRL_DISABLE,
+        .source_clk = UART_SCLK_APB};
 
   uart_param_config(INVERTER_PORT, &uart_config);
   uart_set_pin(INVERTER_PORT, INVERTER_TX, INVERTER_RX, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
@@ -763,7 +763,7 @@ void binaryLoggingStart()
       uart_set_baudrate(INVERTER_PORT, 2250000);
       uart_write_bytes(INVERTER_PORT, "\n", 1);
       delay(1);
-      uart_write_bytes(INVERTER_PORT, "binarylogging 0", strnlen("binarylogging 0", UART_MESSBUF_SIZE));
+      uart_write_bytes(INVERTER_PORT, "binarylogging 0", strlen("binarylogging 0"));
       uart_write_bytes(INVERTER_PORT, "\n", 1);
       uart_wait_tx_done(INVERTER_PORT, UART_TIMEOUT);
       uart_set_baudrate(INVERTER_PORT, 115200);
@@ -777,7 +777,7 @@ void binaryLoggingStop()
 {
   uart_write_bytes(INVERTER_PORT, "\n", 1);
   delay(1);
-  uart_write_bytes(INVERTER_PORT, "binarylogging 0", strnlen("binarylogging 0", UART_MESSBUF_SIZE));
+  uart_write_bytes(INVERTER_PORT, "binarylogging 0", strlen("binarylogging 0"));
   uart_write_bytes(INVERTER_PORT, "\n", 1);
   uart_wait_tx_done(INVERTER_PORT, UART_TIMEOUT);
   uart_set_baudrate(INVERTER_PORT, 115200);
@@ -803,8 +803,6 @@ void binaryLoggingStop()
 }
 
 void loop(void){
-  static int subIndex = 0;
-  static uint32_t serial[4];
   // note: ArduinoOTA.handle() calls MDNS.update();
   server.handleClient();
   ArduinoOTA.handle();

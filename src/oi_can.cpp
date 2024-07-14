@@ -58,16 +58,15 @@
 
 namespace OICan {
 
-enum state { IDLE, ERROR, OBTAINSERIAL, OBTAIN_JSON };
-enum updstate { UPD_IDLE, SEND_MAGIC, SEND_SIZE, SEND_PAGE, CHECK_CRC, REQUEST_JSON };
+enum State { IDLE, ERROR, OBTAINSERIAL, OBTAIN_JSON };
+enum UpdState { UPD_IDLE, SEND_MAGIC, SEND_SIZE, SEND_PAGE, CHECK_CRC, REQUEST_JSON };
 
 static uint8_t _nodeId;
 static BaudRate baudRate;
-static state state;
-static updstate updstate;
+static State state;
+static UpdState updstate;
 static uint32_t serial[4]; //contains id sum as well
 static char jsonFileName[20];
-static char canFileName[20];
 static twai_message_t tx_frame;
 static File updateFile;
 static int currentPage = 0;
@@ -103,13 +102,9 @@ static void setValueSdo(uint16_t index, uint8_t subIndex, uint32_t value) {
   twai_transmit(&tx_frame, pdMS_TO_TICKS(10));
 }
 
-static void setValueSdo(uint16_t index, uint8_t subIndex, double value) {
-  setValueSdo(index, subIndex, (uint32_t)(value * 32));
-}
-
 static int getId(String name) {
-  DynamicJsonDocument doc(300);
-  StaticJsonDocument<200> filter;
+  JsonDocument doc;
+  JsonDocument filter;
 
   File file = SPIFFS.open(jsonFileName, "r");
   filter[name]["id"] = true;
@@ -154,8 +149,8 @@ static void handleSdoResponse(twai_message_t *rxframe) {
           requestSdoElement(SDO_INDEX_SERIAL, rxframe->data[3] + 1);
         }
         else {
-          sprintf(jsonFileName, "/%x.json", serial[3]);
-          DBG_OUTPUT_PORT.printf("Got Serial Number %X:%X:%X:%X\r\n", serial[0], serial[1], serial[2], serial[3]);
+          sprintf(jsonFileName, "/%" PRIx32 ".json", serial[3]);
+          DBG_OUTPUT_PORT.printf("Got Serial Number %" PRIX32 ":%" PRIX32 ":%" PRIX32 ":%" PRIX32 "\r\n", serial[0], serial[1], serial[2], serial[3]);
 
           if (SPIFFS.exists(jsonFileName)) {
             state = IDLE;
@@ -191,6 +186,12 @@ static void handleSdoResponse(twai_message_t *rxframe) {
       }
 
       break;
+    case ERROR:
+      // Do not exit this state
+      break;
+    case IDLE:
+      // Do not exit this state
+      break;
   }
 }
 
@@ -225,7 +226,7 @@ static void handleUpdate(twai_message_t *rxframe) {
         tx_frame.data[2] = rxframe->data[6];
         tx_frame.data[3] = rxframe->data[7];
         updstate = SEND_SIZE;
-        DBG_OUTPUT_PORT.printf("Sending ID %u\r\n", *(uint32_t*)tx_frame.data);
+        DBG_OUTPUT_PORT.printf("Sending ID %" PRIu32 "\r\n", *(uint32_t*)tx_frame.data);
         twai_transmit(&tx_frame, pdMS_TO_TICKS(10));
       }
       break;
@@ -309,6 +310,12 @@ static void handleUpdate(twai_message_t *rxframe) {
         DBG_OUTPUT_PORT.printf("Done!\r\n");
       }
       break;
+    case REQUEST_JSON:
+      // Do not exit this state
+      break;
+    case UPD_IDLE:
+      // Do not exit this state
+      break;
   }
 
 }
@@ -329,7 +336,7 @@ int GetCurrentUpdatePage() {
 bool SendJson(WiFiClient client) {
   if (state != IDLE) return false;
 
-  DynamicJsonDocument doc(50000);
+  JsonDocument doc;
   twai_message_t rxframe;
 
   File file = SPIFFS.open(jsonFileName, "r");
@@ -338,7 +345,7 @@ bool SendJson(WiFiClient client) {
 
   if (result != DeserializationError::Ok) {
     SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
-    updstate == REQUEST_JSON;
+    updstate = REQUEST_JSON;
     retries = 50;
     DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
     return false;
@@ -372,18 +379,22 @@ void SendCanMapping(WiFiClient client) {
 
   twai_message_t rxframe;
   int index = SDO_INDEX_MAP_RD, subIndex = 0;
-  int cobid, pos, len, paramid;
+  int cobid = 0, pos = 0, len = 0, paramid = 0;
   bool rx = false;
   String result;
   ReqMapStt reqMapStt = START;
 
-  DynamicJsonDocument doc(16384);
+  JsonDocument doc;
 
   while (DONE != reqMapStt) {
     switch (reqMapStt) {
     case START:
       requestSdoElement(index, 0); //request COB ID
       reqMapStt = COBID;
+      cobid = 0;
+      pos = 0;
+      len = 0;
+      paramid = 0;
       break;
     case COBID:
       if (twai_receive(&rxframe, pdMS_TO_TICKS(10)) == ESP_OK) {
@@ -432,7 +443,7 @@ void SendCanMapping(WiFiClient client) {
           gain /= 1000;
           int offset = (int8_t)rxframe.data[7];
           DBG_OUTPUT_PORT.printf("can %s %d %d %d %d %f %d\r\n", rx ? "rx" : "tx", paramid, cobid, pos, len, gain, offset);
-          StaticJsonDocument<200> subdoc;
+          JsonDocument subdoc;
           JsonObject object = subdoc.to<JsonObject>();
           object["isrx"] = rx;
           object["id"] = cobid;
@@ -466,7 +477,7 @@ void SendCanMapping(WiFiClient client) {
 SetResult AddCanMapping(String json) {
   if (state != IDLE) return CommError;
 
-  StaticJsonDocument<256> doc;
+  JsonDocument doc;
   twai_message_t rxframe;
 
   deserializeJson(doc, json);
@@ -505,7 +516,7 @@ SetResult AddCanMapping(String json) {
 SetResult RemoveCanMapping(String json){
   if (state != IDLE) return CommError;
 
-  StaticJsonDocument<256> doc;
+  JsonDocument doc;
   twai_message_t rxframe;
 
   deserializeJson(doc, json);
@@ -539,7 +550,7 @@ SetResult SetValue(String name, double value) {
 
   int id = getId(name);
 
-  setValueSdo(SDO_INDEX_PARAM_UID | (id >> 8), id & 0xFF, value);
+  setValueSdo(SDO_INDEX_PARAM_UID | (id >> 8), id & 0xFF, (uint32_t)(value * 32));
 
   if (twai_receive(&rxframe, pdMS_TO_TICKS(10)) == ESP_OK) {
     if (rxframe.data[0] == SDO_RESPONSE_DOWNLOAD)
@@ -646,7 +657,8 @@ void Init(uint8_t nodeId, BaudRate baud) {
         .tx_queue_len = 30,
         .rx_queue_len = 30,
         .alerts_enabled = TWAI_ALERT_NONE,
-        .clkout_divider = 0
+        .clkout_divider = 0,
+        .intr_flags = 0
   };
 
   uint16_t id = 0x580 + nodeId;
@@ -707,7 +719,7 @@ void Loop() {
     else if (rxframe.identifier == 0x7de)
       handleUpdate(&rxframe);
     else
-      DBG_OUTPUT_PORT.printf("Received unwanted frame %u\r\n", rxframe.identifier);
+      DBG_OUTPUT_PORT.printf("Received unwanted frame %" PRIu32 "\r\n", rxframe.identifier);
   }
 
   if (updstate == REQUEST_JSON) {
