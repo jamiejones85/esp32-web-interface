@@ -1,0 +1,74 @@
+name: Continuous Integration
+
+on: [push, pull_request]
+
+jobs:
+  arduino:
+    name: Arduino
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - core: esp32:esp32
+            board: esp32:esp32:esp32
+            softwareserial: false
+            index_url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install arduino-cli
+        run: curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR=/usr/local/bin sh
+
+      - name: Update core index
+        run: arduino-cli core update-index --additional-urls "${{ matrix.index_url }}"
+
+      - name: Install core
+        run: arduino-cli core install --additional-urls "${{ matrix.index_url }}" ${{ matrix.core }}
+
+      - name: Install ESP32Time library
+        run: arduino-cli lib install ESP32Time
+
+      - name: Install RTClib library
+        run: arduino-cli lib install RTClib
+
+      - name: Install ArduinoJson library
+        run: arduino-cli lib install ArduinoJson
+
+      - name: Install StreamUtils library
+        run: arduino-cli lib install StreamUtils
+
+      - name: Build esp32-web-interface
+        run: arduino-cli compile --library . --warnings all -b ${{ matrix.board }} "esp32-web-interface.ino"
+
+  platformio:
+    name: PlatformIO
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: ${{ runner.os }}-platformio
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build release esp32-web-interface
+        run: platformio run -e release
+
+      - name: Build debug esp32-web-interface
+        run: platformio run -e debug

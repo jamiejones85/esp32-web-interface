@@ -2,24 +2,28 @@ esp32-web-interface
 =====================
 Web interface for Huebner inverter
 
+[![Build status](../../actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+
 # Table of Contents
 <details>
  <summary>Click to open TOC</summary>
 <!-- MarkdownTOC autolink="true" levels="1,2,3,4,5,6" bracket="round" style="unordered" indent="    " autoanchor="false" markdown_preview="github" -->
 
+- [esp32-web-interface](#esp32-web-interface)
+- [Table of Contents](#table-of-contents)
 - [About](#about)
 - [Usage](#usage)
-    - [Wifi network](#wifi-network)
-    - [Reaching the board](#reaching-the-board)
+  - [Wifi network](#wifi-network)
+  - [Reaching the board](#reaching-the-board)
 - [Hardware](#hardware)
 - [Firmware](#firmware)
 - [Flashing / Upgrading](#flashing--upgrading)
-    - [Wirelessly](#wirelessly)
-    - [Wired](#wired)
+  - [Wirelessly](#wirelessly)
+  - [Wired](#wired)
 - [Documentations](#documentations)
 - [Development](#development)
-    - [Arduino](#arduino)
-    - [PlatformIO](#platformio)
+  - [Arduino](#arduino)
+  - [PlatformIO](#platformio)
 
 <!-- /MarkdownTOC -->
 </details>
