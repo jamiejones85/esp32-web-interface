@@ -738,7 +738,6 @@ void setup(void){
   });
 
   server.begin();
-  server.client().setNoDelay(1);
 
   MDNS.addService("http", "tcp", 80);
 }

@@ -439,8 +439,9 @@ void SendCanMapping(WiFiClient client) {
     case GAINOFS:
       if (twai_receive(&rxframe, pdMS_TO_TICKS(10)) == ESP_OK) {
         if (rxframe.data[0] != SDO_ABORT) {
-          float gain = (*(int32_t*)&rxframe.data[4]) & 0xFFFFFF;
-          gain /= 1000;
+          int32_t gainFixedPoint = ((*(uint32_t*)&rxframe.data[4]) & 0xFFFFFF) << (32-24);
+          gainFixedPoint >>= (32-24);
+          float gain = gainFixedPoint / 1000.0f;
           int offset = (int8_t)rxframe.data[7];
           DBG_OUTPUT_PORT.printf("can %s %d %d %d %d %f %d\r\n", rx ? "rx" : "tx", paramid, cobid, pos, len, gain, offset);
           JsonDocument subdoc;
@@ -497,7 +498,7 @@ SetResult AddCanMapping(String json) {
     setValueSdo(index, 1, doc["paramid"].as<uint32_t>() | (doc["position"].as<uint32_t>() << 16) | (doc["length"].as<int32_t>() << 24)); //data item, position and length
     if (rxframe.data[0] != SDO_ABORT && twai_receive(&rxframe, pdMS_TO_TICKS(10)) == ESP_OK) {
       DBG_OUTPUT_PORT.println("Sent position and length");
-      setValueSdo(index, 2, (uint32_t)((int32_t)(doc["gain"].as<double>() * 1000) | doc["offset"].as<int32_t>() << 24)); //gain and offset
+      setValueSdo(index, 2, (uint32_t)((int32_t)(doc["gain"].as<double>() * 1000) & 0xFFFFFF) | doc["offset"].as<int32_t>() << 24); //gain and offset
 
       if (rxframe.data[0] != SDO_ABORT && twai_receive(&rxframe, pdMS_TO_TICKS(10)) == ESP_OK) {
         if (rxframe.data[0] != SDO_ABORT){
