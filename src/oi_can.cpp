@@ -326,6 +326,11 @@ int GetCurrentUpdatePage() {
   return currentPage;
 }
 
+void DeleteParams() {
+  SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
+  updstate == REQUEST_JSON;
+}
+
 bool SendJson(WiFiClient client) {
   if (state != IDLE) return false;
 
@@ -337,10 +342,11 @@ bool SendJson(WiFiClient client) {
   file.close();
 
   if (result != DeserializationError::Ok) {
-    SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
-    updstate == REQUEST_JSON;
-    retries = 50;
-    DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
+    // SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
+    // updstate == REQUEST_JSON;
+    // retries = 50;
+    // DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
+
     return false;
   }
 
@@ -637,9 +643,12 @@ BaudRate GetBaudRate() {
 }
 
 void Init(uint8_t nodeId, BaudRate baud) {
+  pinMode(23, OUTPUT);
+  digitalWrite(23, LOW);
+
   twai_general_config_t g_config = {
         .mode = TWAI_MODE_NORMAL,
-        .tx_io = GPIO_NUM_25,
+        .tx_io = GPIO_NUM_27,
         .rx_io = GPIO_NUM_26,
         .clkout_io = TWAI_IO_UNUSED,
         .bus_off_io = TWAI_IO_UNUSED,

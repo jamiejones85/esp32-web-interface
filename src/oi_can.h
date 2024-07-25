@@ -29,6 +29,7 @@ void Init(uint8_t nodeId, BaudRate baud);
 void Loop();
 bool SendJson(WiFiClient c);
 void SendCanMapping(WiFiClient c);
+void DeleteParams();
 SetResult AddCanMapping(String json);
 SetResult RemoveCanMapping(String json);
 SetResult SetValue(String name, double value);

@@ -50,13 +50,10 @@
 #include <FS.h>
 #include <Ticker.h>
 #include <StreamString.h>
-
-#include <SD_MMC.h>
-#include "RTClib.h"
-#include <ESP32Time.h>
-#include <time.h>
 #include "driver/uart.h"
 #include "src/oi_can.h"
+#include <SPI.h>
+#include <SD.h>
 
 #define DBG_OUTPUT_PORT Serial
 #define INVERTER_PORT UART_NUM_2
@@ -72,13 +69,16 @@
 
 #define MAX_SD_FILES 200
 
+#define SD_MISO_PIN 2
+#define SD_MOSI_PIN 15
+#define SD_SCLK_PIN 14
+#define SD_CS_PIN 13
+
 #define LOG_DELAY_VAL 10000
 
 //HardwareSerial Inverter(INVERTER_PORT);
 
 const char* host = "inverter";
-bool fastUart = false;
-bool fastUartAvailable = true;
 char uartMessBuff[UART_MESSBUF_SIZE];
 char jsonFileName[50];
 //DynamicJsonDocument jsonDoc(30000);
@@ -89,117 +89,8 @@ HTTPUpdateServer updater;
 File fsUploadFile;
 Ticker sta_tick;
 
-RTC_PCF8523 ext_rtc;
-ESP32Time int_rtc;
-bool haveRTC = false;
 bool haveSDCard = false;
-bool fastLoggingEnabled = true;
-bool fastLoggingActive = false;
-uint8_t SDIObuffer[SDIO_BUFFER_SIZE];
-uint16_t indexSDIObuffer = 0;
-uint16_t blockCountSD = 0;
-File dataFile;
-int startLogAttempt = 0;
 
-bool createNextSDFile()
-{
-  char filename[50];
-
-  uint32_t nextFileIndex = deleteOldest(RESERVED_SD_SPACE);
-
-  if(haveRTC)
-    nextFileIndex = 0; //have a date so restart index from 0 (still needed in case serial stream fails to start)
-
-  do
-  {
-    if(haveRTC)
-      snprintf(filename, 50, "/%d-%02d-%02d-%02d-%02d-%02d_%d.bin", int_rtc.getYear(), int_rtc.getMonth(), int_rtc.getDay(), int_rtc.getHour(), int_rtc.getMinute(), int_rtc.getSecond(), nextFileIndex++);
-    else
-      snprintf(filename, 50, "/%010d.bin", nextFileIndex++);
-  }
-  while(SD_MMC.exists(filename));
-
-  dataFile = SD_MMC.open(filename, FILE_WRITE);
-  if (dataFile)
-  {
-    dataFile.flush(); //make sure FAT updated for debugging purposes
-    DBG_OUTPUT_PORT.println("Created file: " + String(filename));
-    return true;
-  }
-  else
-    return false;
-}
-
-uint32_t deleteOldest(uint64_t spaceRequired)
-{
-  time_t oldestTime = 0;
-  File root, file;
-  String oldestFileName;
-  uint64_t spaceRem;
-  time_t t;
-  uint32_t nextIndex = 0;
-  uint32_t fileCount = 0;
-
-  spaceRem = SD_MMC.totalBytes() - SD_MMC.usedBytes();
-
-  DBG_OUTPUT_PORT.println("Space Required = " + formatBytes(spaceRequired));
-  DBG_OUTPUT_PORT.println("Space Remaining = " + formatBytes(spaceRem));
-
-  do
-  {
-    root = SD_MMC.open("/");
-
-    oldestTime = 0;
-    fileCount = 0;
-    while(file = root.openNextFile())
-    {
-      if(haveRTC)
-        t = file.getLastWrite();
-      else
-      {
-        String fname = file.name();
-        fname.remove(0,1); //lose starting /
-        t = fname.toInt()+1; //make sure 0 special case isnt used
-        if(t > nextIndex)
-          nextIndex = t;
-      }
-      if(!file.isDirectory())
-      {
-        fileCount++;
-        if((oldestTime==0) || (t<oldestTime))
-        {
-          oldestTime = t;
-          oldestFileName = "/";
-          oldestFileName += file.name();
-        }
-      }
-      file.close();
-    }
-    root.close();
-
-    if((spaceRem < spaceRequired) || (fileCount >= MAX_SD_FILES))
-    {
-      if(oldestFileName.length() > 0)
-      {
-
-        if(SD_MMC.remove(oldestFileName))
-          DBG_OUTPUT_PORT.println("Deleted file: " + oldestFileName);
-        else
-          DBG_OUTPUT_PORT.println("Couldn't delete: " + oldestFileName);
-      }
-      else
-      {
-        DBG_OUTPUT_PORT.println("No files found, can't free space");
-        break;//no files so can do no more
-      }
-    }
-
-    spaceRem = SD_MMC.totalBytes() - SD_MMC.usedBytes();
-  } while((spaceRem < spaceRequired) || (fileCount >= MAX_SD_FILES));
-
-
-  return(nextIndex);
-}
 
 //format bytes
 String formatBytes(uint64_t bytes){
@@ -250,15 +141,14 @@ bool handleFileRead(String path){
   if (haveSDCard) {
     DBG_OUTPUT_PORT.print("handleFileRead Trying SD Card: ");
     DBG_OUTPUT_PORT.println(path);
-    DBG_OUTPUT_PORT.print("SD_MMC.exists: ");
-    DBG_OUTPUT_PORT.println(SD_MMC.exists( path));
 
-    if (SD_MMC.exists(path)) {
-      File file = SD_MMC.open(path, "r");
-      size_t sent = server.streamFile(file, contentType);
-      file.close();
-    return true;
-    }
+
+    // if (SD_MMC.exists(path)) {
+    //   File file = SD_MMC.open(path, "r");
+    //   size_t sent = server.streamFile(file, contentType);
+    //   file.close();
+    //   return true;
+    // }
   }
   return false;
 }
@@ -314,80 +204,35 @@ void handleFileCreate(){
   path = String();
 }
 
-void handleRTCNow() {
-  String output = "{ \"now\":\"";
-  if (haveRTC) {
-    DateTime t = ext_rtc.now();
-    output += t.timestamp();
-  } else {
-    output += "NO RTC";
-  }
-  output += "\"}";
-  server.send(200, "text/json", output);
-}
-
-void handleRTCSet() {
-
- if (server.hasArg("timestamp")) {
-    String timestamp = server.arg("timestamp");
-    server.send(200, "text/json", "{\"result\":\"" + timestamp + "\"}");
-    DateTime now = DateTime(timestamp.toInt());
-    ext_rtc.adjust(now);
-    int_rtc.setTime(now.unixtime());
-    handleRTCNow();
- } else {
-    server.send(500, "text/json", "{\"result\":\"timestamp missing\"}");
-
- }
-}
-void handleSdCardDeleteAll() {
-    if (haveSDCard) {
-      File root, file;
-      if (haveSDCard) {
-        root = SD_MMC.open("/");
-        while(file = root.openNextFile())
-        {
-          String filename = file.name();
-          if(SD_MMC.remove("/" + filename))
-            DBG_OUTPUT_PORT.println("Deleted file: " + filename);
-          else
-            DBG_OUTPUT_PORT.println("Couldn't delete: " + filename);
-          }
-      }
-    }
-
-    server.send(200, "text/json", "{\"result\": \"done\"}");
-
-}
 void handleSdCardList() {
 
   if (!haveSDCard) {
     server.send(200, "text/json", "{\"error\": \"No SD Card\"}");
     return;
   }
-  File root = SD_MMC.open("/");
-  if(!root){
-    server.send(200, "text/json", "{\"error\": \"Failed to open directory\"}");
-    return;
-  }
-  if(!root.isDirectory()){
-    server.send(200, "text/json", "{\"error\": \"Root is not a directory\"}");
-    return;
-  }
-  File sdFile = root.openNextFile();
-  String output = "[";
-  int count = 0;
-  while(sdFile && count < 200){
-    if (output != "[") output += ',';
-    output += "\"";
-    output += String(sdFile.name());
-    output += "\"";
-    sdFile = root.openNextFile();
+  // File root = SD_MMC.open("/");
+  // if(!root){
+  //   server.send(200, "text/json", "{\"error\": \"Failed to open directory\"}");
+  //   return;
+  // }
+  // if(!root.isDirectory()){
+  //   server.send(200, "text/json", "{\"error\": \"Root is not a directory\"}");
+  //   return;
+  // }
+  // File sdFile = root.openNextFile();
+  // String output = "[";
+  // int count = 0;
+  // while(sdFile && count < 200){
+  //   if (output != "[") output += ',';
+  //   output += "\"";
+  //   output += String(sdFile.name());
+  //   output += "\"";
+  //   sdFile = root.openNextFile();
 
-    count++;
-  }
-  output += "]";
-  server.send(200, "text/json", output);
+  //   count++;
+  // }
+  // output += "]";
+  // server.send(200, "text/json", output);
   return;
 }
 
@@ -615,13 +460,6 @@ static void handleWifi()
 }
 
 
-static void handleBaud()
-{
-  if (fastUart)
-    server.send(200, "text/html", "fastUart on");
-  else
-    server.send(200, "text/html", "fastUart off");
-}
 
 void staCheck(){
   sta_tick.detach();
@@ -629,6 +467,7 @@ void staCheck(){
     WiFi.mode(WIFI_AP); //disable station mode
   }
 }
+
 
 void setup(void){
   DBG_OUTPUT_PORT.begin(115200);
@@ -649,32 +488,6 @@ void setup(void){
 
   pinMode(LED_BUILTIN, OUTPUT);
 
-  //check for external RTC and if present use to initialise on-chip RTC
-  if (ext_rtc.begin())
-  {
-    haveRTC = true;
-    DBG_OUTPUT_PORT.println("External RTC found");
-    if (! ext_rtc.initialized() || ext_rtc.lostPower())
-    {
-      DBG_OUTPUT_PORT.println("RTC is NOT initialized, setting to build time");
-      ext_rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    }
-
-    ext_rtc.start();
-    DateTime now = ext_rtc.now();
-    int_rtc.setTime(now.unixtime());
-  }
-  else
-    DBG_OUTPUT_PORT.println("No RTC found, defaulting to sequential file names");
-
-  //initialise SD card in SDIO mode
-  //if (SD_MMC.begin("/sdcard", true, false, 40000, 5U)) {
-  if (SD_MMC.begin()) {
-    DBG_OUTPUT_PORT.println("Started SD_MMC");
-    haveSDCard = true;
-  }
-  else
-    DBG_OUTPUT_PORT.println("Couldn't start SD_MMC");
 
   //Start SPI Flash file system
   SPIFFS.begin();
@@ -701,11 +514,8 @@ void setup(void){
   ArduinoOTA.begin();
   //list directory
   server.on("/list", HTTP_GET, handleFileList);
-
-  server.on("/rtc/now", HTTP_GET, handleRTCNow);
-  server.on("/rtc/set", HTTP_POST, handleRTCSet);
   server.on("/sdcard/list", HTTP_GET, handleSdCardList);
-  server.on("/sdcard/deleteAll", HTTP_GET, handleSdCardDeleteAll);
+
 
   //load editor
   server.on("/edit", HTTP_GET, [](){
@@ -723,10 +533,14 @@ void setup(void){
   server.on("/cmd", handleCommand);
   server.on("/canmap", handleCanMap);
   server.on("/fwupdate", handleUpdate);
-  server.on("/baud", handleBaud);
   server.on("/version", [](){ server.send(200, "text/plain", "1.1.R"); });
   server.on("/nodeid", handleNodeId);
+  server.on("/reboot", HTTP_GET, [](){
 
+    server.send(200, "text/plain", "Rebooting");
+    OICan::DeleteParams();
+    ESP.restart();
+  });
   //called when the url is not defined here
   //use it to load content from SPIFFS
   server.onNotFound([](){
@@ -741,65 +555,17 @@ void setup(void){
   server.client().setNoDelay(1);
 
   MDNS.addService("http", "tcp", 80);
-}
 
-void binaryLoggingStart()
-{
-  if(createNextSDFile())
-  {
-    sendCommand(""); //flush out buffer in case just had power up
-    delay(10);
-    sendCommand("binarylogging 1"); //send start logging command to inverter
-    delayMicroseconds(200);
-    if (uart_readStartsWith("OK"))
-    {
-      uart_set_baudrate(INVERTER_PORT, 2250000);
-      fastLoggingActive = true;
-      DBG_OUTPUT_PORT.println("Binary logging started");
-    }
-    else //no response - in case it did actually switch but we missed response send the turn off command
-    {
-      dataFile.close();
-      uart_set_baudrate(INVERTER_PORT, 2250000);
-      uart_write_bytes(INVERTER_PORT, "\n", 1);
-      delay(1);
-      uart_write_bytes(INVERTER_PORT, "binarylogging 0", strnlen("binarylogging 0", UART_MESSBUF_SIZE));
-      uart_write_bytes(INVERTER_PORT, "\n", 1);
-      uart_wait_tx_done(INVERTER_PORT, UART_TIMEOUT);
-      uart_set_baudrate(INVERTER_PORT, 115200);
-    }
-    delay(10);
-    uart_flush(INVERTER_PORT);
+  SPI.begin(SD_SCLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN);
+  if (!SD.begin(SD_CS_PIN, SPI)) {
+    DBG_OUTPUT_PORT.println("SDCard MOUNT FAIL");
+  } else {
+    uint32_t cardSize = SD.cardSize() / (1024 * 1024);
+    String str = "SDCard Size: " + String(cardSize) + "MB";
+    haveSDCard = true;
+    DBG_OUTPUT_PORT.println(str);
   }
-}
 
-void binaryLoggingStop()
-{
-  uart_write_bytes(INVERTER_PORT, "\n", 1);
-  delay(1);
-  uart_write_bytes(INVERTER_PORT, "binarylogging 0", strnlen("binarylogging 0", UART_MESSBUF_SIZE));
-  uart_write_bytes(INVERTER_PORT, "\n", 1);
-  uart_wait_tx_done(INVERTER_PORT, UART_TIMEOUT);
-  uart_set_baudrate(INVERTER_PORT, 115200);
-  delay(100);
-  uart_flush(INVERTER_PORT);
-  //data should now have stopped so send command again and check response
-  sendCommand("binarylogging 0");
-  if (uart_readStartsWith("OK"))
-  {
-    uart_set_baudrate(INVERTER_PORT, 115200);
-    fastUart = false;
-    fastLoggingActive = false;
-    dataFile.flush(); //make sure up to date
-    dataFile.close();
-    DBG_OUTPUT_PORT.println("Binary logging terminated");
-  }
-  else
-  { //assume still logging so try again next time round
-    uart_set_baudrate(INVERTER_PORT, 2250000);
-  }
-  delay(10);
-  uart_flush(INVERTER_PORT);
 }
 
 void loop(void){
@@ -810,42 +576,4 @@ void loop(void){
   ArduinoOTA.handle();
 
   OICan::Loop();
-
-  if((WiFi.softAPgetStationNum() > 0) || (WiFi.status() == WL_CONNECTED))
-  { //have connections so stop logging
-    startLogAttempt=0; //restart log attempts when next disconnected
-    if(fastLoggingActive) //was it active last pass
-      binaryLoggingStop();
-  }
-  else
-  { //no connections so log
-    if(fastLoggingActive) //already active, just carry on writing data
-    {
-      int spaceAvail = SDIO_BUFFER_SIZE - indexSDIObuffer;
-      int bytesRead = uart_read_bytes(INVERTER_PORT, &SDIObuffer[indexSDIObuffer], spaceAvail, UART_TIMEOUT);
-      if(bytesRead > 0)
-      {
-        indexSDIObuffer += bytesRead;
-        if(indexSDIObuffer >= SDIO_BUFFER_SIZE)
-        {
-          dataFile.write(SDIObuffer, SDIO_BUFFER_SIZE);
-          indexSDIObuffer = 0;
-          blockCountSD++;
-          if(blockCountSD >= FLUSH_WRITES)
-          {
-            blockCountSD = 0;
-            dataFile.flush();
-          }
-        }
-      }
-    }
-    else //not active so start
-    {
-      if(haveSDCard && fastLoggingEnabled && (startLogAttempt < 3) && (millis() > LOG_DELAY_VAL))
-      {
-        startLogAttempt++;
-        binaryLoggingStart();
-      }
-    }
-  }
 }

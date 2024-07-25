@@ -656,3 +656,32 @@ input:checked + .slider:before {
 .communication-error-bar p {
     text-align: center;
 }
+#drive-view {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+}
+#drive-view .info {
+    font-size: xx-large;
+}
+#drive-view .info.right{
+text-align: right
+;}
+
+#drive-view .battery-head{
+    width: 30px;
+    height: 10px;
+    background: var(--black);
+    margin: 0 auto;
+    border: 4px solid var(--white);
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+}
+#drive-view  .battery-body{
+    width: 100px;
+    height: 200px;
+    background: transparent;
+    position: relative;
+    margin: 0 auto;
+    border: 4px solid var(--white);
+    border-radius: 18px;
+}

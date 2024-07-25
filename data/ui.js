@@ -34,6 +34,8 @@ var ui = {
 
 	navbarIsBig: true,
 
+	gauges: [],
+
   shrinkNavbar: function() {
 		document.getElementById("navbar").style.width = "60px";
 		var cw = document.getElementById("content-wrapper");
@@ -84,6 +86,51 @@ var ui = {
 			ui.growNavbar();
 			ui.navbarIsBig = true;
 		}
+	},
+
+	populateDriveView: function() {
+		//   var name = 'soc-gauge'
+		//   var gauge = new RadialGauge( 
+		// 	{ 
+		// 		renderTo: name, 
+		// 		title: "SoC",
+		// 		width: 350, 
+		// 		height: 350, 
+		// 		minValue: 0, 
+		// 		maxValue: 100,
+		// 		majorTicks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+		// 	});
+		// 	gauge.draw();
+		// 	gauges['soc'] = gauge;
+			
+	},
+
+	refreshDriveView: function() {
+		// gauges['soc'].value = Math. round(paramsCache.get("SOC"))
+		// gauges['soc'].update();
+
+		// var minCell =  document.getElementById("min-cell");
+		// var maxCell =  document.getElementById("max-cell");
+		// var batteryVoltage =  document.getElementById("battery-voltage");
+		// var minTCell = document.getElementById("min-t-cell")
+		// var maxTCell = document.getElementById("max-t-cell")
+		// var amps = document.getElementById("battery-amps")
+		// var kwh = document.getElementById("battery-kwh")
+		// var invT = document.getElementById("inv-t")
+		// var motorT = document.getElementById("motor-t")
+		// var gear = document.getElementById("gear")
+
+		// minCell.innerText = paramsCache.get("BMS_Vmin") + "mV"
+		// maxCell.innerText = paramsCache.get("BMS_Vmax") + "mV"
+		// batteryVoltage.innerText = paramsCache.get('udc') + "V"
+		// minTCell.innerText = paramsCache.get('BMS_Tmin') + "C"
+		// maxTCell.innerText = paramsCache.get('BMS_Tmax') + "C"
+		// amps.innerText = paramsCache.get('idc') + "A"
+		// kwh.innerText = paramsCache.get('KWh')
+		// invT.innerText = paramsCache.get('tmphs')
+		// motorT.innerText = Math.round(paramsCache.get('tmpm'))
+		// gear.innerText = paramsCache.get('GearFB')
+
 	},
 
 	/** @brief switch to a different page tab */
@@ -141,6 +188,7 @@ var ui = {
 		wifi.populateWiFiTab();
 		ui.populateFileList();
 		ui.refreshStatusBox();
+		ui.populateDriveView();
 		ui.getNodeId();
 		ui.setAutoReload(true);
 	},
@@ -150,6 +198,7 @@ var ui = {
 	{
 		ui.updateTables();
 		ui.refreshStatusBox();
+		ui.refreshDriveView();
 	},
 
 	getNodeId: function() {
@@ -422,6 +471,8 @@ var ui = {
 		var udc = paramsCache.get('udc');
 		var tmphs = paramsCache.get('tmphs');
 		var opmode = paramsCache.get('opmode');
+		var idc = paramsCache.get('idc');
+		var soc = paramsCache.get('SOC');
 
 		statusDiv.innerHTML = "";
 
@@ -463,16 +514,24 @@ var ui = {
 		td.appendChild(document.createTextNode(udc));
 		tr.appendChild(td);
 		tbody.appendChild(tr);
-		// tmphs
+		// idc
 		tr = document.createElement('tr');
 		td = document.createElement('td');
-		td.appendChild(document.createTextNode('Inverter temperature'));
+		td.appendChild(document.createTextNode('IDC'));
 		tr.appendChild(td);
 		td = document.createElement('td');
-		td.appendChild(document.createTextNode(tmphs));
+		td.appendChild(document.createTextNode(idc));
 		tr.appendChild(td);
 		tbody.appendChild(tr);
-
+		// soc
+		tr = document.createElement('tr');
+		td = document.createElement('td');
+		td.appendChild(document.createTextNode('SoC'));
+		tr.appendChild(td);
+		td = document.createElement('td');
+		td.appendChild(document.createTextNode(soc));
+		tr.appendChild(td);
+		tbody.appendChild(tr);
 
 		tbl.appendChild(tbody);
 		statusDiv.appendChild(tbl);

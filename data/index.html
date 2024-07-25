@@ -32,6 +32,7 @@
 <script src="log.js" type="text/javascript"></script>
 <script src="wifi.js" type="text/javascript"></script>
 <script src="plot.js" type="text/javascript"></script>
+<script src="gauge.min.js" type="text/javascript"></script>
 <script src="ui.js" type="text/javascript"></script>
 
 </head>
@@ -127,6 +128,9 @@
 				<a class="tablink" onclick="ui.openPage('dashboard', this, 'white')" style="background-color:white">
 					<!-- /icon-grid.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAFpJREFUSIljYBhO4DADA8N/PPgwOWoZkTT9J8IRMPVEq2XBYwgywGUgQbVMRLiEIjBqAUGALZKJSSFEq0X2wRECao/gYBNSO4zAaFGBVe3Qz2hD34LRomLgAQDIVzQ/KtRExgAAAABJRU5ErkJggg=="><p class="navbar-text">DASHBOARD</p></a>
+				<a class="tablink" onclick="ui.openPage('drive', this, 'white')">
+						<!-- /icon-grid.png -->
+						<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAFpJREFUSIljYBhO4DADA8N/PPgwOWoZkTT9J8IRMPVEq2XBYwgywGUgQbVMRLiEIjBqAUGALZKJSSFEq0X2wRECao/gYBNSO4zAaFGBVe3Qz2hD34LRomLgAQDIVzQ/KtRExgAAAABJRU5ErkJggg=="><p class="navbar-text">DRIVE</p></a>
 				<a class="tablink" onclick="ui.openPage('update', this, 'white')">
 					<!-- /icon-cpu.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAALlJREFUSInVVe0ORTAMPRG53gnvd/FavMrmMfihZGa6dhdxT9JI+nW6VVcgjp5EqldjIpHqd8iuqEBDUADoAFgcK5w88fUWQAvgwxF2gURaaTiCtfKSczpBRbGGcxI1ThP/SJP7ELMD1+7L2RxsdskJ6kQbyxzTiX0fH7RbCGJNTsHW5FwZdBmzC81vGr2J/5xkFyN9q4Rc69BZzqnF78/1lyMoiMQkJDZYdgG7cEJ4906WDNqg1O8wA3zYflZwNkaoAAAAAElFTkSuQmCC"><p class="navbar-text">UPDATE</p></a>
@@ -195,7 +199,7 @@
 						<button onclick="ui.sendCmd('stop');">
 							<!-- icon-square.png -->
 							<img class="buttonimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAHNJREFUSIntlTEOgCAMRV8c5E7i/RTuCR5DB8ugaRwogxp+0nRo8h5h+fCnOCACGdgrJwMBGDVBNIDvs2qC8vKp7gMA8MJI2rHYrblwhgbAx3RBF3RBF7xNsMn2Bt4sO2vHQLvCWTSBE0kygBNnm6mV+c0cZy9SUXHYiZQAAAAASUVORK5CYII=">Stop inverter</button>
-
+						<a href="/reboot">Reboot ESP32</a>
 					</div>
 
 					<div class="main-left">
@@ -221,7 +225,46 @@
 						</div>
 					</div>
 				</div>
+				<div id="drive" class="tabdiv main-content">
+					<div class="battery">
+						<div class="battery-head"></div>
+						<div class="battery-body">
+							<i class="fas fa-bolt"></i>
+							<div class="charge"></div>
+						</div>
+					
+					</div>
+					<!--
+					<div class="main-left">
+						<h2 id="spot">Drive View</h2>
+						<div id="drive-view">
+							<div class="info">
+								Min Cell: <span id="min-cell"></span><br />
+								Min Cell: <span id="min-t-cell"></span><br />
 
+								Voltage: <span id="battery-voltage"></span><br />
+								Amps: <span id="battery-amps"></span><br />
+								kWh: <span id="battery-kwh"></span><br />
+								<br />
+								Gear: <span id="gear"></span><br />
+							</div>
+							<div style="text-align: center;">
+								<canvas style="margin: auto;" id="soc-gauge"></canvas>
+							</div>
+							<div class="info right">
+								<span id="max-cell"></span> :Max Cell<br />
+								<span id="max-t-cell"></span> :Max Cell
+								<br />
+								<br />
+								<br />
+
+								<span id="inv-t"></span>C :Inv<br />
+								<span id="motor-t"></span>C :Motor
+							</div>
+						</div>
+					</div>
+					-->
+				</div>
 				<!-- UPDATE -->
 				<div id="update" class="tabdiv main-content">
 
