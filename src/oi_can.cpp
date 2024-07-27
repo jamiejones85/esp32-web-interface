@@ -227,6 +227,8 @@ static void handleUpdate(twai_message_t *rxframe) {
         updstate = SEND_SIZE;
         DBG_OUTPUT_PORT.printf("Sending ID %u\r\n", *(uint32_t*)tx_frame.data);
         twai_transmit(&tx_frame, pdMS_TO_TICKS(10));
+        if (rxframe->data[1] < 1) //boot loader with timing quirk, wait 100 ms
+          delay(100);
       }
       break;
     case SEND_SIZE:
@@ -318,7 +320,8 @@ int StartUpdate(String fileName) {
   //Reset host processor
   setValueSdo(SDO_INDEX_COMMANDS, SDO_CMD_RESET, 1U);
   updstate = SEND_MAGIC;
-
+  currentPage = 0;
+  DBG_OUTPUT_PORT.println("Starting Update");
   return (updateFile.size() + PAGE_SIZE_BYTES - 1) / PAGE_SIZE_BYTES;
 }
 
@@ -342,10 +345,10 @@ bool SendJson(WiFiClient client) {
   file.close();
 
   if (result != DeserializationError::Ok) {
-    // SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
-    // updstate == REQUEST_JSON;
-    // retries = 50;
-    // DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
+    SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
+    updstate = REQUEST_JSON;
+    retries = 50;
+    DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
 
     return false;
   }
