@@ -181,6 +181,9 @@ var ui = {
 			}
 		});
 
+		var selectedStorage = document.getElementById('storage');
+		selectedStorage.addEventListener('change', () => ui.populateFileList())
+
 		ui.updateTables();
 		plot.generateChart();
 		ui.parameterDatabaseCheckForUpdates();
@@ -1317,8 +1320,9 @@ var ui = {
 		var filesTable = document.getElementById('filesTable');
 		// emtpy the table
 		while (filesTable.rows.length > 1) filesTable.deleteRow(1);
-		// fetch file list and populate table
-		inverter.getFiles(function(files)
+
+		var selectedStorage = document.getElementById('storage');
+		const callback = function(files)
 		{
 			for ( var i = 0; i < files.length; i++ )
 			{
@@ -1330,7 +1334,14 @@ var ui = {
 				var deleteFileCell = tr.insertCell(-1);
 				deleteFileCell.innerHTML = "<button onclick=\"ui.showDeleteFileConfirmationModal('" + files[i]['name'] + "');\"><img class=\"buttonimg\" src=\"/icon-trash.png\">Delete File</button>";
 			}
-		});
+		}
+
+		if (selectedStorage.value == 'onboard') {
+			// fetch file list and populate table
+			inverter.getFiles(callback);
+		} else if (selectedStorage.value == 'sdcard') {
+			inverter.getSDFiles(callback);
+		}
 	},
 
 	showDeleteFileConfirmationModal: function(filename)
@@ -1350,6 +1361,8 @@ var ui = {
 		var deleteFileRequest = new XMLHttpRequest();
 		var params = {}
 		params.f = "/" + filename;
+
+		var selectedStorage = document.getElementById('storage')
 		deleteFileRequest.onload = function()
     	{
     		// re-build file list
@@ -1363,7 +1376,7 @@ var ui = {
 			alert("error");
 		};
 
-		deleteFileRequest.open("DELETE", "/edit?f=" + filename, true);
+		deleteFileRequest.open("DELETE", "/edit?f=" + filename + '&s=' + selectedStorage.value, true);
 		deleteFileRequest.send();
 
 	},

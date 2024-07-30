@@ -52,6 +52,7 @@
 #include <StreamString.h>
 #include "driver/uart.h"
 #include "src/oi_can.h"
+
 #include <SPI.h>
 #include <SD.h>
 
@@ -142,13 +143,12 @@ bool handleFileRead(String path){
     DBG_OUTPUT_PORT.print("handleFileRead Trying SD Card: ");
     DBG_OUTPUT_PORT.println(path);
 
-
-    // if (SD_MMC.exists(path)) {
-    //   File file = SD_MMC.open(path, "r");
-    //   size_t sent = server.streamFile(file, contentType);
-    //   file.close();
-    //   return true;
-    // }
+    File file = SD.open(path);
+    if (file) {
+      size_t sent = server.streamFile(file, contentType);
+      file.close();
+      return true;
+    }
   }
   return false;
 }
@@ -176,12 +176,20 @@ void handleFileUpload(){
 void handleFileDelete(){
   if(server.args() == 0) return server.send(500, "text/plain", "BAD ARGS");
   String path = server.arg(0);
+  String storage = server.arg(1);
+
   //DBG_OUTPUT_PORT.println("handleFileDelete: " + path);
   if(path == "/")
     return server.send(500, "text/plain", "BAD PATH");
-  if(!SPIFFS.exists(path))
-    return server.send(404, "text/plain", "FileNotFound");
-  SPIFFS.remove(path);
+
+  if (storage == "onboard") {
+    if(!SPIFFS.exists(path))
+      return server.send(404, "text/plain", "FileNotFound");
+    SPIFFS.remove(path);
+  } else if (storage == "sdcard") {
+    SD.remove(path);
+  }
+
   server.send(200, "text/plain", "");
   path = String();
 }
@@ -210,31 +218,34 @@ void handleSdCardList() {
     server.send(200, "text/json", "{\"error\": \"No SD Card\"}");
     return;
   }
-  // File root = SD_MMC.open("/");
-  // if(!root){
-  //   server.send(200, "text/json", "{\"error\": \"Failed to open directory\"}");
-  //   return;
-  // }
-  // if(!root.isDirectory()){
-  //   server.send(200, "text/json", "{\"error\": \"Root is not a directory\"}");
-  //   return;
-  // }
-  // File sdFile = root.openNextFile();
-  // String output = "[";
-  // int count = 0;
-  // while(sdFile && count < 200){
-  //   if (output != "[") output += ',';
-  //   output += "\"";
-  //   output += String(sdFile.name());
-  //   output += "\"";
-  //   sdFile = root.openNextFile();
+  File root = SD.open("/");
+  if(!root){
+    server.send(200, "text/json", "{\"error\": \"Failed to open directory\"}");
+    return;
+  }
+  if(!root.isDirectory()){
+    server.send(200, "text/json", "{\"error\": \"Root is not a directory\"}");
+    return;
+  }
+  File sdFile = root.openNextFile();
+  String output = "[";
 
-  //   count++;
-  // }
-  // output += "]";
-  // server.send(200, "text/json", output);
-  return;
+  File file = root.openNextFile();
+  while(file){
+    if (output != "[") output += ',';
+    bool isDir = false;
+    output += "{\"type\":\"";
+    output += file.isDirectory()?"dir":"file";
+    output += "\",\"name\":\"";
+    output += String(file.name());
+    output += "\"}";
+    file = root.openNextFile();
+  }
+
+  output += "]";
+  server.send(200, "text/json", output);
 }
+
 
 void handleFileList() {
   String path = "/";

@@ -253,6 +253,28 @@ var inverter = {
     filesRequest.send();
   },
 
+     /** @brief get a list of files in the SD card filesystem */
+  getSDFiles: function(replyFunc)
+     {
+       var filesRequest = new XMLHttpRequest();
+       filesRequest.onload = function()
+       {
+         if (this.responseText == 'FileNotFound') {
+          alert('Cannot open SD card')
+         } else {
+          var filesJson = JSON.parse(this.responseText);
+          replyFunc(filesJson);
+         }
+ 
+       }
+       filesRequest.onerror = function()
+       {
+         alert("error");
+       }
+       filesRequest.open("GET", "/sdcard/list", true);
+       filesRequest.send();
+     },
+
   /** @brief delete a file from the spiffs filessytem on the esp8266 */
   deleteFile: function(filename, replyFunc)
   {
