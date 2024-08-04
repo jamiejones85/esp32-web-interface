@@ -39,7 +39,7 @@
 
 <body onload="ui.onLoad()">
 
-	<div id="content">
+	<div id="content" class="dark-theme">
 
 		<!-- Large modal -->
 		<div id="large-modal-overlay" class="modal-overlay">
@@ -125,12 +125,15 @@
 			</div>
 
       <div>
-				<a class="tablink" onclick="ui.openPage('dashboard', this, 'white')" style="background-color:white">
+				<a class="tablink active" onclick="ui.openPage('dashboard', this, 'white')" >
 					<!-- /icon-grid.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAFpJREFUSIljYBhO4DADA8N/PPgwOWoZkTT9J8IRMPVEq2XBYwgywGUgQbVMRLiEIjBqAUGALZKJSSFEq0X2wRECao/gYBNSO4zAaFGBVe3Qz2hD34LRomLgAQDIVzQ/KtRExgAAAABJRU5ErkJggg=="><p class="navbar-text">DASHBOARD</p></a>
-				<a class="tablink" onclick="ui.openPage('drive', this, 'white')">
-						<!-- /icon-grid.png -->
-						<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAFpJREFUSIljYBhO4DADA8N/PPgwOWoZkTT9J8IRMPVEq2XBYwgywGUgQbVMRLiEIjBqAUGALZKJSSFEq0X2wRECao/gYBNSO4zAaFGBVe3Qz2hD34LRomLgAQDIVzQ/KtRExgAAAABJRU5ErkJggg=="><p class="navbar-text">DRIVE</p></a>
+				<!-- <a class="tablink" onclick="ui.openPage('drive', this, 'white')"> -->
+					<!-- /icon-grid.png -->
+					<!-- <img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAxHpUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHjabVBBDsQgCLz7in2COKj4HLvtJvuDff6i0KZtOokjMGREwvb7fsJrIBEHzlVKKyUquHFLXQOJhj6ZIk+2ZNfoWg+HkLQEvWGpFO/f63QY2NU1yicjebuwXIXG7i83I38IY6KkwepGzY2QTCA36PatWJrU8xeWLV4hdsIg1Ol9mNxzrrq9NWsRKW0gRGVAbACMwwFdg6oMjEaCaJzRJpNPogt52tOO8Af1MlkyQKi/TgAAAYRpQ0NQSUNDIHByb2ZpbGUAAHicfZE9SMNAHMVfU6UiFRE7iIhkqE52URHdahWKUCHUCq06mFz6ITRpSFJcHAXXgoMfi1UHF2ddHVwFQfADxNnBSdFFSvxfUmgR48FxP97de9y9A4R6mWlWRxzQdNtMJxNiNrcihl4RwjD6MAPIzDJmJSkF3/F1jwBf72I8y//cn6NHzVsMCIjEcWaYNvE68dSmbXDeJ46wkqwSnxOPmXRB4keuKx6/cS66LPDMiJlJzxFHiMViGyttzEqmRjxJHFU1nfKFrMcq5y3OWrnKmvfkLwzn9eUlrtMcQhILWIQEEQqq2EAZNmK06qRYSNN+wsc/6Polcink2gAjxzwq0CC7fvA/+N2tVZgY95LCCaDzxXE+RoDQLtCoOc73seM0ToDgM3Clt/yVOjD9SXqtpUWPgN5t4OK6pSl7wOUOMPBkyKbsSkGaQqEAvJ/RN+WA/luge9XrrbmP0wcgQ12lboCDQ2C0SNlrPu/uau/t3zPN/n4As4BywFjgE/EAAA16aVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/Pgo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJYTVAgQ29yZSA0LjQuMC1FeGl2MiI+CiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgeG1wTU06RG9jdW1lbnRJRD0iZ2ltcDpkb2NpZDpnaW1wOjE3MTJlMDJhLTdjYjgtNDZmMS04ZGY3LTZmN2U3ODMwNThkZSIKICAgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmNDUyNTE2Ni02Y2Q4LTQ5MDgtYTA5Ny03MDc0MDQ0ZjVkMTYiCiAgIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoyMDdlYTJhMS0xN2RkLTRkMjYtODMwNy01ZTVhY2EyNGMzOTIiCiAgIEdJTVA6QVBJPSIyLjAiCiAgIEdJTVA6UGxhdGZvcm09Ik1hYyBPUyIKICAgR0lNUDpUaW1lU3RhbXA9IjE3MjIzNjIzOTE5ODE4MDIiCiAgIEdJTVA6VmVyc2lvbj0iMi4xMC4zOCIKICAgZGM6Rm9ybWF0PSJpbWFnZS9wbmciCiAgIHRpZmY6T3JpZW50YXRpb249IjEiCiAgIHhtcDpDcmVhdG9yVG9vbD0iR0lNUCAyLjEwIgogICB4bXA6TWV0YWRhdGFEYXRlPSIyMDI0OjA3OjMwVDE4OjU5OjUxKzAxOjAwIgogICB4bXA6TW9kaWZ5RGF0ZT0iMjAyNDowNzozMFQxODo1OTo1MSswMTowMCI+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249InNhdmVkIgogICAgICBzdEV2dDpjaGFuZ2VkPSIvIgogICAgICBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjUxMDI0ZGMyLWI4MDktNDFlZS04NTVjLWJjMGFiMDJhMTAxMyIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iR2ltcCAyLjEwIChNYWMgT1MpIgogICAgICBzdEV2dDp3aGVuPSIyMDI0LTA3LTMwVDE4OjU5OjUxKzAxOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICA8L3JkZjpEZXNjcmlwdGlvbj4KIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/PkA9QJsAAAAGYktHRABQAP8A+bupCuEAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfoBx4ROzOqo4iaAAACvElEQVRIx53WzWuUVxQG8F+GiQpOok1b0NlYtRhpu+hCWpygYDaubBALVqMoFF3V2k39B3RRa6urdqcgQWja2kiSjVAaq26KQoJNFEJaBuo+tVlYTEi6eUZeQ8xHD1zmveeec+65zz3nudNkebIKa9Cc+TT+xbOlHJsWWSthM/ZhF7Zifdb+xgTuYAB1zFqBvIqvMJ7fPahidUY1uq9j8yXalht8O0bivBEV7EyQwYzz0VVicxHDaF9O8Ic4lEyPxvEuzgSuffm+m7UjsT0c3/bFYBlJ8LW4giHUFkmohluxXZtNhheCq4QLwXt1HHoCwVJSie3l+F4KnKWi0ZZc1sbA8itaCutlvJmMa/luLqy35CTdKYDxxHwunyX7SmDaFX0zduAmfk+QW3gQ+DrSI+IzkhgXcbrYRNdTdjtxDxsy74nTwWTWhQ9y0i78hhvYm/X7eB+d+LGxeWuCVHMPU8nwOj7O5a9Lxr0Zv8RvfYqiNzGmUsLVzFvlxuuhgoFku65wdCnN3kKjfR+dApSt8e1PrDraygtUxVM8sTKZLvDTC1LGTLilDY9wEu+Fp+bwF37G67kTeA2jOIFNBdt3MZZYk5gpZ9eJdGBfmuWHkFcpmx1PCb6dDUZxLeU4VLA9jrNhhIniiU6HeyrpxNo8qv4mJ2vICVwN1g3piG8lzfbpyxrtSKqk2MXHcK4wPxddsZuHUlEvNFqjneup588DTz1ZNzaZnfd2NBX4v4Jv8Sd+ChH2JcbzDWbxRZrrAD7J5ffn6KVcYkPmoutIaU/jFD7E7sRa8AFqD+UeDr7daZjHeQe6MgajGy5Qe3d8ty31ZLbju3DOBfyDd7Afb8XmYeAYS4OdSeYfBf8lpS2UOx7i6szlrcmoRncpNufxyv959N+Y9+g3gkziD9wOXC999JtW+LelQS0zy/3b8h8MpK5leW/PnQAAAABJRU5ErkJggg=="><p class="navbar-text">DRIVE</p></a> -->
+				<a class="tablink" onclick="ui.openPage('drive2', this, 'white')">
+					<!-- /icon-grid.png -->
+					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAxHpUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHjabVBBDsQgCLz7in2COKj4HLvtJvuDff6i0KZtOokjMGREwvb7fsJrIBEHzlVKKyUquHFLXQOJhj6ZIk+2ZNfoWg+HkLQEvWGpFO/f63QY2NU1yicjebuwXIXG7i83I38IY6KkwepGzY2QTCA36PatWJrU8xeWLV4hdsIg1Ol9mNxzrrq9NWsRKW0gRGVAbACMwwFdg6oMjEaCaJzRJpNPogt52tOO8Af1MlkyQKi/TgAAAYRpQ0NQSUNDIHByb2ZpbGUAAHicfZE9SMNAHMVfU6UiFRE7iIhkqE52URHdahWKUCHUCq06mFz6ITRpSFJcHAXXgoMfi1UHF2ddHVwFQfADxNnBSdFFSvxfUmgR48FxP97de9y9A4R6mWlWRxzQdNtMJxNiNrcihl4RwjD6MAPIzDJmJSkF3/F1jwBf72I8y//cn6NHzVsMCIjEcWaYNvE68dSmbXDeJ46wkqwSnxOPmXRB4keuKx6/cS66LPDMiJlJzxFHiMViGyttzEqmRjxJHFU1nfKFrMcq5y3OWrnKmvfkLwzn9eUlrtMcQhILWIQEEQqq2EAZNmK06qRYSNN+wsc/6Polcink2gAjxzwq0CC7fvA/+N2tVZgY95LCCaDzxXE+RoDQLtCoOc73seM0ToDgM3Clt/yVOjD9SXqtpUWPgN5t4OK6pSl7wOUOMPBkyKbsSkGaQqEAvJ/RN+WA/luge9XrrbmP0wcgQ12lboCDQ2C0SNlrPu/uau/t3zPN/n4As4BywFjgE/EAAA16aVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/Pgo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJYTVAgQ29yZSA0LjQuMC1FeGl2MiI+CiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgeG1wTU06RG9jdW1lbnRJRD0iZ2ltcDpkb2NpZDpnaW1wOjE3MTJlMDJhLTdjYjgtNDZmMS04ZGY3LTZmN2U3ODMwNThkZSIKICAgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmNDUyNTE2Ni02Y2Q4LTQ5MDgtYTA5Ny03MDc0MDQ0ZjVkMTYiCiAgIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDoyMDdlYTJhMS0xN2RkLTRkMjYtODMwNy01ZTVhY2EyNGMzOTIiCiAgIEdJTVA6QVBJPSIyLjAiCiAgIEdJTVA6UGxhdGZvcm09Ik1hYyBPUyIKICAgR0lNUDpUaW1lU3RhbXA9IjE3MjIzNjIzOTE5ODE4MDIiCiAgIEdJTVA6VmVyc2lvbj0iMi4xMC4zOCIKICAgZGM6Rm9ybWF0PSJpbWFnZS9wbmciCiAgIHRpZmY6T3JpZW50YXRpb249IjEiCiAgIHhtcDpDcmVhdG9yVG9vbD0iR0lNUCAyLjEwIgogICB4bXA6TWV0YWRhdGFEYXRlPSIyMDI0OjA3OjMwVDE4OjU5OjUxKzAxOjAwIgogICB4bXA6TW9kaWZ5RGF0ZT0iMjAyNDowNzozMFQxODo1OTo1MSswMTowMCI+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249InNhdmVkIgogICAgICBzdEV2dDpjaGFuZ2VkPSIvIgogICAgICBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjUxMDI0ZGMyLWI4MDktNDFlZS04NTVjLWJjMGFiMDJhMTAxMyIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iR2ltcCAyLjEwIChNYWMgT1MpIgogICAgICBzdEV2dDp3aGVuPSIyMDI0LTA3LTMwVDE4OjU5OjUxKzAxOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICA8L3JkZjpEZXNjcmlwdGlvbj4KIDwvcmRmOlJERj4KPC94OnhtcG1ldGE+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAKPD94cGFja2V0IGVuZD0idyI/PkA9QJsAAAAGYktHRABQAP8A+bupCuEAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfoBx4ROzOqo4iaAAACvElEQVRIx53WzWuUVxQG8F+GiQpOok1b0NlYtRhpu+hCWpygYDaubBALVqMoFF3V2k39B3RRa6urdqcgQWja2kiSjVAaq26KQoJNFEJaBuo+tVlYTEi6eUZeQ8xHD1zmveeec+65zz3nudNkebIKa9Cc+TT+xbOlHJsWWSthM/ZhF7Zifdb+xgTuYAB1zFqBvIqvMJ7fPahidUY1uq9j8yXalht8O0bivBEV7EyQwYzz0VVicxHDaF9O8Ic4lEyPxvEuzgSuffm+m7UjsT0c3/bFYBlJ8LW4giHUFkmohluxXZtNhheCq4QLwXt1HHoCwVJSie3l+F4KnKWi0ZZc1sbA8itaCutlvJmMa/luLqy35CTdKYDxxHwunyX7SmDaFX0zduAmfk+QW3gQ+DrSI+IzkhgXcbrYRNdTdjtxDxsy74nTwWTWhQ9y0i78hhvYm/X7eB+d+LGxeWuCVHMPU8nwOj7O5a9Lxr0Zv8RvfYqiNzGmUsLVzFvlxuuhgoFku65wdCnN3kKjfR+dApSt8e1PrDraygtUxVM8sTKZLvDTC1LGTLilDY9wEu+Fp+bwF37G67kTeA2jOIFNBdt3MZZYk5gpZ9eJdGBfmuWHkFcpmx1PCb6dDUZxLeU4VLA9jrNhhIniiU6HeyrpxNo8qv4mJ2vICVwN1g3piG8lzfbpyxrtSKqk2MXHcK4wPxddsZuHUlEvNFqjneup588DTz1ZNzaZnfd2NBX4v4Jv8Sd+ChH2JcbzDWbxRZrrAD7J5ffn6KVcYkPmoutIaU/jFD7E7sRa8AFqD+UeDr7daZjHeQe6MgajGy5Qe3d8ty31ZLbju3DOBfyDd7Afb8XmYeAYS4OdSeYfBf8lpS2UOx7i6szlrcmoRncpNufxyv959N+Y9+g3gkziD9wOXC999JtW+LelQS0zy/3b8h8MpK5leW/PnQAAAABJRU5ErkJggg=="><p class="navbar-text">DRIVE</p></a>
 				<a class="tablink" onclick="ui.openPage('update', this, 'white')">
 					<!-- /icon-cpu.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAALlJREFUSInVVe0ORTAMPRG53gnvd/FavMrmMfihZGa6dhdxT9JI+nW6VVcgjp5EqldjIpHqd8iuqEBDUADoAFgcK5w88fUWQAvgwxF2gURaaTiCtfKSczpBRbGGcxI1ThP/SJP7ELMD1+7L2RxsdskJ6kQbyxzTiX0fH7RbCGJNTsHW5FwZdBmzC81vGr2J/5xkFyN9q4Rc69BZzqnF78/1lyMoiMQkJDZYdgG7cEJ4906WDNqg1O8wA3zYflZwNkaoAAAAAElFTkSuQmCC"><p class="navbar-text">UPDATE</p></a>
@@ -225,20 +228,10 @@
 						</div>
 					</div>
 				</div>
-				<div id="drive" class="tabdiv main-content">
-					<div class="battery">
-						<div class="battery-head"></div>
-						<div class="battery-body">
-							<i class="fas fa-bolt"></i>
-							<div class="charge"></div>
-						</div>
-					
-					</div>
-					<!--
-					<div class="main-left">
-						<h2 id="spot">Drive View</h2>
+				<!-- <div id="drive" class="tabdiv main-content">
+					<div class="">
 						<div id="drive-view">
-							<div class="info">
+							<div class="info left">
 								Min Cell: <span id="min-cell"></span><br />
 								Min Cell: <span id="min-t-cell"></span><br />
 
@@ -247,6 +240,8 @@
 								kWh: <span id="battery-kwh"></span><br />
 								<br />
 								Gear: <span id="gear"></span><br />
+								MG1: <span id="mg1"></span><br />
+								MG2: <span id="mg2"></span><br />
 							</div>
 							<div style="text-align: center;">
 								<canvas style="margin: auto;" id="soc-gauge"></canvas>
@@ -263,7 +258,78 @@
 							</div>
 						</div>
 					</div>
-					-->
+					
+				</div> -->
+				<div id="drive2" class="tabdiv main-content">
+					<div class="bubbles">
+						<div class="bubble">
+							<div>Energy</div>
+							<div id="battery-kwh" class="bubble-main">--kWh</div>
+						</div>
+						<div class="bubble">
+							<div>Min Cell</div>
+							<div id="min-cell" class="bubble-main">----mV</div>
+						</div>
+						<div class="bubble">
+							<div>Max Cell</div>
+							<div id="max-cell" class="bubble-main">----mV</div>
+						</div>
+						<div class="bubble">
+							<div>Gear</div>
+							<div id="gear" class="bubble-main">-</div>
+						</div>
+					</div>
+					<div class="battery">
+						<div class="battery-top"></div>
+						<div class="battery-body">
+							<div class="battery-segment battery-segment-10 battery-segment-charged "></div>
+							<div class="battery-segment battery-segment-20 battery-segment-charged "></div>
+							<div class="battery-segment battery-segment-30 battery-segment-charged "></div>
+							<div class="battery-segment battery-segment-40"></div>
+							<div class="battery-segment battery-segment-50"></div>
+							<div class="battery-segment battery-segment-60"></div>
+							<div class="battery-segment battery-segment-70"></div>
+							<div class="battery-segment battery-segment-80"></div>
+							<div class="battery-segment battery-segment-90"></div>
+							<div class="battery-segment battery-segment-100"></div>
+						</div>
+
+						<div class="battery-percent" id="battery-soc">-%</div>
+						<div class="battery-voltage" id="battery-voltage">---V</div>
+
+					</div>
+					<div class="bubbles bubbles-bottom">
+						<div class="bubble">
+							<div>Inverter</div>
+							<div id="inv-temp" class="bubble-main">-&deg;C</div>
+						</div>
+						<div class="bubble">
+							<div>Min Cell</div>
+							<div id="min-t-cell" class="bubble-main">-&deg;C</div>
+						</div>
+						<div class="bubble">
+							<div>Max Cell</div>
+							<div id="max-t-cell" class="bubble-main">-&deg;C</div>
+						</div>
+						<div class="bubble">
+							<div>Motor</div>
+							<div id="motor-t" class="bubble-main">-&deg;C</div>
+						</div>
+						<div class="bubble">
+							<div>Amps</div>
+							<div id="battery-amps" class="bubble-main">-&deg;A</div>
+						</div>
+					</div>
+					<div class="extra">
+						<div>
+							<div>MG1 RPM</div>
+							<div id="battery-mg1">-RPM</div>
+						</div>
+						<div>
+							<div>MG2 RPM</div>
+							<div id="battery-mg2">-RPM</div>
+						</div>
+					</div>
 				</div>
 				<!-- UPDATE -->
 				<div id="update" class="tabdiv main-content">

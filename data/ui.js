@@ -37,12 +37,12 @@ var ui = {
 	gauges: [],
 
   shrinkNavbar: function() {
-		document.getElementById("navbar").style.width = "60px";
+		document.getElementById("navbar").style.width = "45px";
 		var cw = document.getElementById("content-wrapper");
-		cw.style.left = "60px";
-		cw.style.width = "calc(100% - 60px)";
+		cw.style.left = "45px";
+		cw.style.width = "calc(100% - 45px)";
 		var logo = document.getElementById("logo");
-		logo.style.width = "60px";
+		logo.style.width = "50px";
 		logo.style.height = "50px";
 		// buttons
 		var buttons = document.getElementsByClassName("buttonimg");
@@ -89,47 +89,52 @@ var ui = {
 	},
 
 	populateDriveView: function() {
-		//   var name = 'soc-gauge'
-		//   var gauge = new RadialGauge( 
-		// 	{ 
-		// 		renderTo: name, 
-		// 		title: "SoC",
-		// 		width: 350, 
-		// 		height: 350, 
-		// 		minValue: 0, 
-		// 		maxValue: 100,
-		// 		majorTicks: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-		// 	});
-		// 	gauge.draw();
-		// 	gauges['soc'] = gauge;
-			
+
 	},
 
 	refreshDriveView: function() {
-		// gauges['soc'].value = Math. round(paramsCache.get("SOC"))
-		// gauges['soc'].update();
 
-		// var minCell =  document.getElementById("min-cell");
-		// var maxCell =  document.getElementById("max-cell");
-		// var batteryVoltage =  document.getElementById("battery-voltage");
-		// var minTCell = document.getElementById("min-t-cell")
-		// var maxTCell = document.getElementById("max-t-cell")
-		// var amps = document.getElementById("battery-amps")
-		// var kwh = document.getElementById("battery-kwh")
-		// var invT = document.getElementById("inv-t")
-		// var motorT = document.getElementById("motor-t")
-		// var gear = document.getElementById("gear")
+		var minCell =  document.getElementById("min-cell");
+		var maxCell =  document.getElementById("max-cell");
+		var batteryVoltage =  document.getElementById("battery-voltage");
+		var minTCell = document.getElementById("min-t-cell")
+		var maxTCell = document.getElementById("max-t-cell")
+		var amps = document.getElementById("battery-amps")
+		var kwh = document.getElementById("battery-kwh")
+		var invT = document.getElementById("inv-temp")
+		var motorT = document.getElementById("motor-t")
+		var gear = document.getElementById("gear")
+		var soc = document.getElementById("battery-soc")
+		var mg1 = document.getElementById("battery-mg1")
+		var mg2 = document.getElementById("battery-mg2")
+		const roundedSoc = Math.floor(paramsCache.get('SOC') / 10) * 10;
 
-		// minCell.innerText = paramsCache.get("BMS_Vmin") + "mV"
-		// maxCell.innerText = paramsCache.get("BMS_Vmax") + "mV"
-		// batteryVoltage.innerText = paramsCache.get('udc') + "V"
-		// minTCell.innerText = paramsCache.get('BMS_Tmin') + "C"
-		// maxTCell.innerText = paramsCache.get('BMS_Tmax') + "C"
-		// amps.innerText = paramsCache.get('idc') + "A"
-		// kwh.innerText = paramsCache.get('KWh')
-		// invT.innerText = paramsCache.get('tmphs')
-		// motorT.innerText = Math.round(paramsCache.get('tmpm'))
-		// gear.innerText = paramsCache.get('GearFB')
+		minCell.innerText = paramsCache.get("BMS_Vmin") + "mV"
+		maxCell.innerText = paramsCache.get("BMS_Vmax") + "mV"
+		batteryVoltage.innerText = paramsCache.get('udc') + "V"
+		minTCell.innerText = paramsCache.get('BMS_Tmin') + "°C"
+		maxTCell.innerText = paramsCache.get('BMS_Tmax') + "°C"
+		amps.innerText = paramsCache.get('idc') + "A"
+		kwh.innerText = (Math.round(paramsCache.get('KWh') * 10) / 10)  + "kWh"
+		invT.innerText = paramsCache.get('tmphs')  + "°C"
+		motorT.innerText = Math.round(paramsCache.get('tmpm'))+ "°C"
+		gear.innerText = paramsCache.get('GearFB')
+		soc.innerText =  Math.round(paramsCache.get('SOC')) +"%"
+		mg1.innerText = paramsCache.get('mg1RPM') + "RPM"
+		mg2.innerText = paramsCache.get('mg2RPM') + "RPM"
+
+		const segments = document.getElementsByClassName("battery-segment");
+		[].forEach.call(segments, function(el) {
+			el.classList.remove("battery-segment-charged");
+		});
+
+		for (let step = 0; step <= roundedSoc; step = step+10) {
+			const segments = document.getElementsByClassName("battery-segment-" + step);
+			[].forEach.call(segments, function(el) {
+				el.classList.add("battery-segment-charged");
+			});
+		}
+
 
 	},
 
@@ -146,12 +151,12 @@ var ui = {
 	    // un-highlight all tabs
 	    tablinks = document.getElementsByClassName("tablink");
 	    for (i = 0; i < tablinks.length; i++) {
-	        tablinks[i].style.backgroundColor = "";
+	        tablinks[i].classList.remove('active')
 	    }
 
 	    // show selected tab
 	    document.getElementById(pageName).style.display = "flex";
-	    elmnt.style.backgroundColor = color;
+	    elmnt.classList.add('active')
 
 	    // Right menu has nothing in it for spot values, so hide it
 	    var mainRights = document.getElementsByClassName("main-right");

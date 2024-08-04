@@ -331,7 +331,7 @@ int GetCurrentUpdatePage() {
 
 void DeleteParams() {
   SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
-  updstate == REQUEST_JSON;
+  updstate = REQUEST_JSON;
 }
 
 bool SendJson(WiFiClient client) {
@@ -345,12 +345,12 @@ bool SendJson(WiFiClient client) {
   file.close();
 
   if (result != DeserializationError::Ok) {
-    SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
-    updstate = REQUEST_JSON;
-    retries = 50;
-    DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
+    // SPIFFS.remove(jsonFileName); //if json file is invalid, remove it and trigger re-download
+    // updstate = REQUEST_JSON;
+    // retries = 50;
+    // DBG_OUTPUT_PORT.println("JSON file invalid, re-downloading");
 
-    return false;
+    // return false;
   }
 
   JsonObject root = doc.as<JsonObject>();
