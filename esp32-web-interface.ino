@@ -587,13 +587,20 @@ static void handleNodeId()
 static void handleSettings()
 {
   bool updated = true;
-  if(server.hasArg("canRXPin") && server.hasArg("canRXPin"))
+  if(server.hasArg("canRXPin") && server.hasArg("canRXPin")  && server.hasArg("canEnablePin"))
   {
     config.setCanRXPin(atoi(server.arg("canRXPin").c_str()));
     config.setCanTXPin(atoi(server.arg("canTXPin").c_str()));
+    config.setCanEnablePin(atoi(server.arg("canEnablePin").c_str()));
+
     config.saveSettings();
     OICan::Init(OICan::GetNodeId(), OICan::GetBaudRate(), config.getCanTXPin(), config.getCanRXPin());
 
+
+    if (config.getCanEnablePin() > 0) {
+      pinMode(config.getCanEnablePin(), OUTPUT);
+      digitalWrite(config.getCanEnablePin(), LOW);
+    }
   }
   else
   {
@@ -602,6 +609,8 @@ static void handleSettings()
     file.close();
     html.replace("%canRXPin%", String(config.getCanRXPin()).c_str());
     html.replace("%canTXPin%", String(config.getCanTXPin()).c_str());
+    html.replace("%canEnablePin%", String(config.getCanEnablePin()).c_str());
+
     server.send(200, "text/html", html);
     updated = false;
   }
@@ -726,6 +735,11 @@ void setup(void){
   MDNS.begin(host);
 
   config.load();
+
+  if (config.getCanEnablePin() > 0) {
+    pinMode(config.getCanEnablePin(), OUTPUT);
+    digitalWrite(config.getCanEnablePin(), LOW);
+  }
 
   OICan::Init(1, OICan::Baud500k, config.getCanTXPin(), config.getCanRXPin());
 
