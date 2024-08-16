@@ -31,6 +31,7 @@
 <script src="subscription.js" type="text/javascript"></script>
 <script src="log.js" type="text/javascript"></script>
 <script src="wifi.js" type="text/javascript"></script>
+<script src="settings.js" type="text/javascript"></script>
 <script src="plot.js" type="text/javascript"></script>
 <script src="ui.js" type="text/javascript"></script>
 
@@ -148,6 +149,9 @@
 				<a class="tablink" onclick="ui.openPage('wifi', this, 'white')">
 					<!-- /icon-wifi.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAVdJREFUSInt1L9KXEEYBfDf2ogsBhTR7FpIYq2WEtIFspV2koBo8A2CIija+Ao+gJWEkKQQBZUETRM2L2AvWPkvASURFHXXYmfZRd27dy9IUnjgNPebc74z880dHvGvkYqoteEVcuhDVyAc4BA7+IbvOInbdACfcIViTF7hI/qjjLNYRSGIzrGFGbzEc6QDe8O3WWzjImgKWEHmtvlr7IdFf7CI7rhbRicWlI6piGMMlYvjVanXw+Kk6MKGym7GYQynmHR36Bm8xxp28Rdn2AtG0+i5pUlhKniO1UryFEsqZxvFS3y4p1FNDONI5XZ8CUl6lQbcgmd4i+WqECcYjdOgPKjNYFQP3fgcNNdorid4g3eif8L7MIKJBjWgFXPI41dgHvN4ksSwGoPBsNaAf+NFlEFTnQYZtCu9Nzl0BObwVem9yiaOH5BOWPs/8QM/GxHUm8EjHh43i7Jhzxg3JD0AAAAASUVORK5CYII="><p class="navbar-text">WIFI SETTINGS</p></a>
+					<a class="tablink" onclick="ui.openPage('settings', this, 'white')">
+						<!-- /icon-tool.png -->
+					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAUdJREFUSInl1M8uBEEQx/HPcmbj33IQVxJeQ4Q34U6WFV7FS/hzccGFOHEgvMAiER6AdeiaZIwsM6xEopJOd1dXf6vnN9XNH7RxNHGOx2gnaGHgp/Al3KPTpS3/FP4aoF0sYBo34bvE6HfhE3gI0BZqaAQ0gzcidgQrKsrVDNBewOtd4PmkrSoJzmPTQsw3voB3cAx9JRNMRX8afaew3sAh5nAbvtnSx8dTQAdjXpQoP56JcbtKgpPYtFg4dV6STK6lmJ+VhTdwHZuahbU61sNflwrgIGLXysLzn/9ZndewHbF30o2vBM+qZQybklyjGJZk2Y/YV++lrAQv6l5sd72CX+NIeugepPJdzcV2tTFcBORKeiI+81eyoRInz/sr285vwmt4xgsmew3PErQDNh9JegbPbMvHsusZHPojSVuSa0f68f/c3gAXBoY3A6QNPQAAAABJRU5ErkJggg=="><p class="navbar-text">SETTINGS</p></a>
 				<a class="tablink" onclick="ui.openPage('files', this, 'white')">
 					<!-- /icon-file-text.png -->
 					<img class="navimg" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAK5JREFUSIljYKAzYGdgYOhmYGB4xsDA8J8A/srAwCBGqgWdRBiMjC+TagnM5VYE1JFtCUwTseouQenrDAwMkrSwQJRUS0i1gIFUS0i1ABv+TIoFh5HEDuMQx4bhgIUI12IDtngciBcQG0RE62eiwDCiACELCIU1etyQbAHVwWgckGwB1cHQj4PnUNqaDLNgxcczfIo6GEirMrHhdnwWsEEteUqGwU+hhrMR6WPqAAAbTIrOKieWjwAAAABJRU5ErkJggg=="><p class="navbar-text">FILES</p></a>
@@ -526,6 +530,8 @@
 
 				<!-- WIFI SETTINGS -->
 				<div id="wifi" class="tabdiv main-content"></div>
+				<!-- SETTINGS -->
+				<div id="settings" class="tabdiv main-content"></div>
 
 				<!-- FILES -->
 				<div id="files" class="tabdiv main-content">

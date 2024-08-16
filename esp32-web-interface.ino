@@ -57,6 +57,7 @@
 #include <time.h>
 #include "driver/uart.h"
 #include "src/oi_can.h"
+#include "src/config.h"
 
 #define DBG_OUTPUT_PORT Serial
 #define INVERTER_PORT UART_NUM_2
@@ -100,6 +101,7 @@ uint16_t indexSDIObuffer = 0;
 uint16_t blockCountSD = 0;
 File dataFile;
 int startLogAttempt = 0;
+Config config;
 
 bool createNextSDFile()
 {
@@ -572,15 +574,46 @@ static void handleNodeId()
     int id = server.arg("id").toInt();
     int speed = server.arg("canspeed").toInt();
     OICan::BaudRate baud = speed == 0 ? OICan::Baud125k : (speed == 1 ? OICan::Baud250k : OICan::Baud500k);
-    OICan::Init(id, baud);
+    OICan::Init(id, baud, config.getCanTXPin(), config.getCanRXPin());
   }
   else if(server.hasArg("id")) {
     int id = server.arg("id").toInt();
-    OICan::Init(id, OICan::Baud500k);
+    OICan::Init(id, OICan::Baud500k, config.getCanTXPin(), config.getCanRXPin());
   }
 
   server.send(200, "text/plain", String(OICan::GetNodeId()) + "," + String(OICan::GetBaudRate()));
 }
+
+static void handleSettings()
+{
+  bool updated = true;
+  if(server.hasArg("canRXPin") && server.hasArg("canRXPin"))
+  {
+    config.setCanRXPin(atoi(server.arg("canRXPin").c_str()));
+    config.setCanTXPin(atoi(server.arg("canTXPin").c_str()));
+    config.saveSettings();
+    OICan::Init(OICan::GetNodeId(), OICan::GetBaudRate(), config.getCanTXPin(), config.getCanRXPin());
+
+  }
+  else
+  {
+    File file = SPIFFS.open("/settings.html", "r");
+    String html = file.readString();
+    file.close();
+    html.replace("%canRXPin%", String(config.getCanRXPin()).c_str());
+    html.replace("%canTXPin%", String(config.getCanTXPin()).c_str());
+    server.send(200, "text/html", html);
+    updated = false;
+  }
+
+  if (updated)
+  {
+    File file = SPIFFS.open("/settings-updated.html", "r");
+    size_t sent = server.streamFile(file, getContentType("settings-updated.html"));
+    file.close();
+  }
+}
+
 
 static void handleWifi()
 {
@@ -692,7 +725,9 @@ void setup(void){
 
   MDNS.begin(host);
 
-  OICan::Init(1, OICan::Baud500k);
+  config.load();
+
+  OICan::Init(1, OICan::Baud500k, config.getCanTXPin(), config.getCanRXPin());
 
   updater.setup(&server);
 
@@ -726,6 +761,7 @@ void setup(void){
   server.on("/baud", handleBaud);
   server.on("/version", [](){ server.send(200, "text/plain", "1.1.R"); });
   server.on("/nodeid", handleNodeId);
+  server.on("/settings", handleSettings);
 
   //called when the url is not defined here
   //use it to load content from SPIFFS

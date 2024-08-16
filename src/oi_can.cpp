@@ -636,11 +636,11 @@ BaudRate GetBaudRate() {
   return baudRate;
 }
 
-void Init(uint8_t nodeId, BaudRate baud) {
+void Init(uint8_t nodeId, BaudRate baud, int txPin, int rxPin) {
   twai_general_config_t g_config = {
         .mode = TWAI_MODE_NORMAL,
-        .tx_io = GPIO_NUM_25,
-        .rx_io = GPIO_NUM_26,
+        .tx_io = static_cast<gpio_num_t>(txPin),
+        .rx_io = static_cast<gpio_num_t>(rxPin),
         .clkout_io = TWAI_IO_UNUSED,
         .bus_off_io = TWAI_IO_UNUSED,
         .tx_queue_len = 30,

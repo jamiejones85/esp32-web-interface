@@ -1,5 +1,5 @@
-/*
- * This file is part of the esp32 web interface
+<!--
+ * This file is part of the esp8266 web interface
  *
  * Copyright (C) 2018 Johannes Huebner <dev@johanneshuebner.com>
  *
@@ -16,29 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
-#ifndef OI_CAN_H
-#define OI_CAN_H
-#include <WiFiClient.h>
+-->
+<div id="settingsInner">
+    <h2>Settings</h2>
+    <form id="settingsForm" enctype="multipart/form-data" action="settings" method="POST">
 
-namespace OICan {
-enum SetResult { Ok, UnknownIndex, ValueOutOfRange, CommError };
-enum BaudRate { Baud125k, Baud250k, Baud500k };
+        <p><label for="canTXPin">CAN TX Pin: </label><input id="canTXPin" name="canTXPin" type="text" value="%canTXPin%"/></p>
+        <p><label for="canRXPin">CAN RX Pin: </label><input id="canRXPin" name="canRXPin" type="text" value="%canRXPin%"/></p>
 
-void Init(uint8_t nodeId, BaudRate baud, int txPin, int rxPin);
-void Loop();
-bool SendJson(WiFiClient c);
-void SendCanMapping(WiFiClient c);
-SetResult AddCanMapping(String json);
-SetResult RemoveCanMapping(String json);
-SetResult SetValue(String name, double value);
-double GetValue(String name);
-bool SaveToFlash();
-String StreamValues(String names, int samples);
-int StartUpdate(String fileName);
-int GetCurrentUpdatePage();
-int GetNodeId();
-BaudRate GetBaudRate();
-
-}
-#endif
+        <a href="#" onclick="ui.settingsForm('settingsForm');"><button>
+            <img class="buttonimg" src="/icon-check-circle.png">Modify</button></a>
+    </form>
+</div>

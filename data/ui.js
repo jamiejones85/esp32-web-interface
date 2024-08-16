@@ -139,6 +139,7 @@ var ui = {
 		ui.parameterDatabaseCheckForUpdates();
 		inverter.canMapping(ui.populateExistingCanMappingTable);
 		wifi.populateWiFiTab();
+		settings.populateSettingsTab();
 		ui.populateFileList();
 		ui.refreshStatusBox();
 		ui.getNodeId();
